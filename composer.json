@@ -1,0 +1,25 @@
+{
+    "name": "edson/meu-projeto-composer",
+    "autoload": {
+        "psr-4": {
+            "Edson\\MeuProjetoComposer\\": "src/"
+        }        
+    },
+    "authors": [
+        {
+            "name": "EdsonAkaves",
+            "email": "edson.akaves@gmail.com"
+        }
+    ],
+    "require": {
+        "ramsey/uuid": "^4.9",
+        "citco/carbon": "^3.0"
+    },
+
+    "scripts": {
+        "rodar-teste-carbon": "php ex003.php"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.5"
+    }
+}
