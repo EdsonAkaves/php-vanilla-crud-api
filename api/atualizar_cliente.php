@@ -2,6 +2,7 @@
 
 require_once '../vendor/autoload.php';
 require_once '../src/Database/conexao.php';
+require_once 'auth.php';
 
 header('Content-Type: application/json');
 
@@ -12,15 +13,25 @@ if ($_SERVER['REQUEST_METHOD'] !== 'PUT') {
     exit;
 }
 
-$id = $_GET['id'] ?? null;
-if (!$id || !filter_var($id, FILTER_VALIDATE_INT)) {
+$usuarioAutenticadoId = autenticar();
+
+$idParaAtualizar = $_GET['id'] ?? null;
+if (!$idParaAtualizar || !filter_var($idParaAtualizar, FILTER_VALIDATE_INT)) {
     http_response_code(400);
     json_encode(['erro' => 'Id do cliente é inválido ou não foi fornecido.']);
     exit;
 }
 
+$idParaAtualizar = (int)$idParaAtualizar;
+
+if ($idParaAtualizar !== $usuarioAutenticadoId){
+    http_response_code(403);
+        echo json_encode(['erro' => 'Você não tem permissão para atualizar este usuário.']);
+    exit;
+}
+
 $dados = json_decode(file_get_contents('php://input'), true);
-if (!$dados === null) {
+if ($dados === null) {
     http_response_code(400);
     echo json_encode(['erro' => 'Corpo da requisição inválido ou vazio.']);
 }
@@ -38,6 +49,12 @@ if (!empty($dados['email'] ?? '') && filter_var($dados['email'], FILTER_VALIDATE
     $parametros[':email'] = $dados['email'];
 }
 
+if (!empty($dados['senha'] ?? '')) {
+    $senhaHash = password_hash($dados['senha'], PASSWORD_DEFAULT);
+    $camposParaAtualizar[] = "senha = :senha";
+    $parametros[':senha'] = $senhaHash;
+}
+
 if (empty($camposParaAtualizar)) {
     http_response_code(400);
     echo json_encode(['erro' => 'Dados não enviados.']);
@@ -48,8 +65,8 @@ if (empty($camposParaAtualizar)) {
 try {
     $pdo = conectar();
 
-    $sql = "UPDATE clientes SET " . implode(', ', $camposParaAtualizar) .  " WHERE  id = :id";
-    $parametros[':id'] = $id;
+    $sql = "UPDATE clientes SET " . implode(', ', $camposParaAtualizar) .  " WHERE  idParaAtualizar = :idParaAtualizar";
+    $parametros[':idParaAtualizar'] = $idParaAtualizar;
 
     $stmt = $pdo->prepare($sql);
 

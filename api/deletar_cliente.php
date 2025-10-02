@@ -2,6 +2,8 @@
 
 require_once '../vendor/autoload.php';
 require_once '../src/Database/conexao.php';
+require_once 'auth.php';
+
 
 header('Content-Type: application/json');
 
@@ -11,14 +13,23 @@ if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
     exit;
 }
 
-$id = $_GET['id'] ?? null;
+$usuarioAutenticadoId = autenticar();
 
-if (!$id || !filter_var($id, FILTER_VALIDATE_INT)) {
+$idParaDeletar = $_GET['id'] ?? null;
+if (!$idParaDeletar || !filter_var($idParaDeletar, FILTER_VALIDATE_INT)) {
     http_response_code(400);
     echo json_encode(['erro' => 'Id com formato inválido.']);
     exit;
 }
 
+$idParaDeletar = (int)$idParaDeletar;
+
+
+if ($idParaDeletar !== $usuarioAutenticadoId) {
+    http_response_code(403);
+    echo json_encode(['erro' => 'Você não tem permissão para deletar este usuário.']);
+    exit;
+}
 
 
 try {
@@ -28,13 +39,13 @@ try {
     $sql1 = "DELETE FROM pedidos WHERE id_cliente = :id_cliente";
     $stmt1 = $pdo->prepare($sql1);
     $stmt1->execute([
-        ':id_cliente' => $id
+        ':id_cliente' => $idParaDeletar
     ]);
 
     $sql2 = "DELETE FROM clientes WHERE id = :id";
     $stmt2 = $pdo->prepare($sql2);
     $stmt2->execute([
-        ':id' => $id
+        ':id' => $idParaDeletar
     ]);
 
     if ($stmt2->rowCount() === 0) {
