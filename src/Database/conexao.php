@@ -2,17 +2,17 @@
 
 function conectar(): PDO 
 {
-    $config = require __DIR__ . '/../../config/database.php';
+    $host = $_ENV['DB_HOST'];
+    $dbName = $_ENV['DB_NAME'];
+    $user = $_ENV['DB_USER'];
+    $password = $_ENV['DB_PASSWORD'];
 
-    $dsn = "mysql:host={$config['host']};dbname={$config['db']};charset=utf8";
+    $dsn = "mysql:host={$host};dbname={$dbName};charset=utf8";
 
     try {
-        $pdo = new PDO(
-            $dsn,
-            $config['user'],
-            $config['password'],
-            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-        );
+        $pdo = new PDO($dsn, $user, $password, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION            
+        ]);
 
         return $pdo;
 

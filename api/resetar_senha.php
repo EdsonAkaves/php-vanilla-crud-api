@@ -1,7 +1,6 @@
 <?php 
 
-require_once '../vendor/autoload.php';
-require_once '../src/Database/conexao.php';
+require_once __DIR__ . '/../bootstrap.php';
 use Carbon\Carbon;
 
 header('Content-type: application-json');
@@ -42,7 +41,7 @@ try {
 
     $novaSenhaHash = password_hash($novaSenha, PASSWORD_DEFAULT);
 
-    $sqlUpdate = "UPDATE clientes SET senha = :senha, reset_tokenn = NULL, reset_token_expira_em = NULL WHERE id = :id";
+    $sqlUpdate = "UPDATE clientes SET senha = :senha, reset_token = NULL, reset_token_expira_em = NULL WHERE id = :id";
     $stmtUpdate = $pdo->prepare($sqlUpdate);
     $stmtUpdate->execute([
         ':senha' => $novaSenhaHash,

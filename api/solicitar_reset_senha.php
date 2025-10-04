@@ -1,6 +1,5 @@
 <?php 
-require_once '../vendor/autoload.php';
-require_once '../src/Database/conexao.php';
+require_once __DIR__ . '/../bootstrap.php';
 use Carbon\Carbon;
 
 header('Content-type: application/json');
@@ -31,7 +30,7 @@ try {
 
     if ($cliente) {
         $token = bin2hex((random_bytes(32)));
-        $expiraEm = Carbon::now()->addMinutes(15)->toDayDateTimeString();
+        $expiraEm = Carbon::now()->addMinutes(15)->toDateTimeString();
 
         $sqlUpdate = "UPDATE clientes SET reset_token = :token, reset_token_expira_em = :expira_em WHERE id = :id";
         $stmt = $pdo->prepare($sqlUpdate);

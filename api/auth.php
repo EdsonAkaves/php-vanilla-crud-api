@@ -1,6 +1,5 @@
 <?php
-require_once '../vendor/autoload.php';
-require_once '../src/Database/conexao.php';
+require_once __DIR__ . '/../bootstrap.php';
 use Carbon\Carbon;
 
 function autenticar(): int

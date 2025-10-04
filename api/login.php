@@ -1,8 +1,7 @@
 <?php 
-
-require_once '../vendor/autoload.php';
-require_once '../src/Database/conexao.php';
+require_once __DIR__ . '/../bootstrap.php';
 use Carbon\Carbon;
+use Firebase\JWT\JWT;
 
 header('Content-Type: application/json');
 
@@ -41,29 +40,24 @@ try {
         exit;
     }
 
-    $token = bin2hex(random_bytes(32));
-    $expiraEm = Carbon::now()->addHours(1)->toDateTimeString();
+
+        $chaveSecreta = $_ENV['JWT_SECRET_KEY'];
+
+        $payload = [
+            'iss' => 'http://localhost/php-vanilla-crud-api',
+            'aud' => 'http://localhost/php-vanilla-crud-api',
+            'iat' => Carbon::now()->timestamp,
+            'exp' => Carbon::now()->addHour()->timestamp,
+            'sub' => $cliente['id']
+        ];
 
 
-    $sqlInsert = "INSERT INTO auth_tokens (id_cliente, token, data_expiracao ) VALUES (:id_cliente, :token, :data_expiracao)";
-    $stmtInsert = $pdo->prepare($sqlInsert);
+        $jwt = JWT::encode($payload, $chaveSecreta, 'HS256');
 
-    $sucesso = $stmtInsert->execute([
-        ':id_cliente' => $cliente['id'],
-        ':token' => $token,
-        ':data_expiracao' => $expiraEm
-    ]);
-
-    if($sucesso) {
         http_response_code(200);
-        echo json_encode([
-            'token' => $token,
-            'expira_em' => $expiraEm
-        ]);
-    } else {
-        http_response_code(500);
-        echo json_encode(['erro' => 'Não foi possível gerar o token de acesso.']);
-    }
+        echo json_encode(['token' => $jwt]);
+
+
 
 } catch (\PDOException $e) {
     http_response_code(500);
