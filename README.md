@@ -30,6 +30,10 @@ Esta API foi desenvolvida como projeto de estudos para demonstrar conhecimentos 
 - **Resetar senha** com token de segurança
 - Token com **validade de 15 minutos**
 
+## 🔗 Cliente de Exemplo
+
+Veja um exemplo de consumo desta API: [Cliente API PHP](https://github.com/EdsonAkaves/cliente-api)
+
 ## 🛠️ Tecnologias Utilizadas
 
 - **PHP 8.2+** - Linguagem principal
